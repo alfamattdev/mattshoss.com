@@ -101,6 +101,9 @@ p { max-width: 62ch; text-wrap: pretty; }
 .nav-links a:hover, .nav-links a.is-current { color: var(--ink); }
 .nav-action { min-height: 2.4rem; padding-inline: 1rem; font-size: var(--step-small); }
 
+/* The small mark in the nav only when the column is wide enough for everything on one line. */
+@media (min-width: 60em) and (max-width: 100em) { .nav-mark { display: none; } .nav-links { margin-right: auto; } }
+
 /* ---------- hero ---------- */
 .hero { padding-top: clamp(0.75rem, 3svh, 2rem); padding-bottom: 0; }
 .wordmark { font-size: var(--step-display); line-height: 0.9; letter-spacing: -0.045em; margin-left: -0.04em; transform-origin: left bottom; position: relative; z-index: 2; }
@@ -164,14 +167,30 @@ p { max-width: 62ch; text-wrap: pretty; }
 .work-desc { margin-top: 0.8rem; max-width: 46ch; color: var(--accent-ink); }
 .work-link:hover .work-role { text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 0.06em; }
 
-/* Press: plain names in columns */
-.press-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem 1.5rem; }
-.press-kind-name { color: var(--muted); font-size: var(--step-body); margin-bottom: 0.75rem; }
-.press-item { display: block; text-decoration: none; padding-block: 0.6rem; }
-.press-item + .press-item { margin-top: 0.25rem; }
-.press-name { display: block; font-family: var(--font-display); font-size: var(--step-item); line-height: 1.15; letter-spacing: -0.01em; transition: color var(--t-hover) ease; }
-.press-title { display: block; margin-top: 0.3rem; font-size: var(--step-small); line-height: 1.4; color: var(--muted); }
-.press-item:hover .press-name { color: var(--accent); text-decoration: underline; text-underline-offset: 0.15em; text-decoration-thickness: 0.06em; }
+/* Press: wordmarks you can tap; one headline card in view, the next swipes it out */
+.press { display: grid; gap: 1.5rem; }
+.press-marks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; }
+.press-mark { appearance: none; border: 0; background: none; padding: 0.3rem 0; margin: 0; cursor: pointer; font: inherit; font-family: var(--font-display); font-size: var(--step-item); line-height: 1.15; letter-spacing: -0.01em; color: var(--muted); transition: color var(--t-hover) ease, transform var(--t-ui) var(--ease-out); }
+.press-mark.is-on { color: var(--ink); }
+.press-mark:hover { color: var(--accent); }
+.press-mark.is-on:hover { color: var(--accent); }
+.press-cards { list-style: none; margin: 0; padding: 0; display: grid; overflow: clip; }
+.press-card { grid-area: 1 / 1; min-width: 0; }
+.press-card-link { display: grid; gap: 0.6rem; padding: 1.4rem 1.5rem 1.5rem; background: var(--accent); color: var(--accent-ink); text-decoration: none; height: 100%; box-sizing: border-box; }
+.press-card-name { font-family: var(--font-display); font-size: var(--step-big); line-height: 0.98; letter-spacing: -0.03em; }
+.press-card-title { font-size: var(--step-body); line-height: 1.4; max-width: 44ch; }
+.press-card-cta { margin-top: 0.4rem; font-size: var(--step-small); font-weight: 500; color: #b9d2b7; transition: color var(--t-hover) ease; }
+.press-card-link:hover .press-card-cta { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 0.06em; }
+.js .press-card { opacity: 0; visibility: hidden; transform: translateX(48px); pointer-events: none; }
+.js .press-card.is-on { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
+.js .press-card.is-out { opacity: 0; visibility: visible; transform: translateX(-48px); }
+@media (prefers-reduced-motion: no-preference) {
+  .js .press-card { transition: opacity 520ms ease, transform 640ms var(--ease-out), visibility 0s linear 640ms; }
+  .js .press-card.is-on { transition: opacity 520ms ease 120ms, transform 640ms var(--ease-out) 120ms, visibility 0s; }
+  .js .press-card.is-out { transition: opacity 360ms var(--ease-exit), transform 520ms var(--ease-in-out), visibility 0s linear 520ms; }
+}
+html:not(.js) .press-card + .press-card { margin-top: 0.5rem; }
+html:not(.js) .press-card { grid-area: auto; }
 
 /* About: the letter */
 .letter { max-width: 34rem; }
@@ -259,6 +278,7 @@ a.contact-row:hover .contact-value { color: var(--accent-ink); }
   .nav-action { min-height: 2.25rem; padding-inline: 0.8rem; }
   .hero { padding-top: 0.5rem; padding-bottom: 0; }
   .hero-more { display: none; }
+  .hero-lead { font-size: 1.125rem; }
   .hero-lead { margin-top: 0.5rem; font-size: var(--step-small); }
   .socials { gap: 0.25rem 0.6rem; margin-top: 0.5rem; font-size: 0.875rem; }
   .links { padding-top: 1.1rem; }
@@ -274,20 +294,16 @@ a.contact-row:hover .contact-value { color: var(--accent-ink); }
   .videos { grid-template-columns: 1fr 1fr; gap: 1rem 0.75rem; }
   .video-title { font-size: 1.25rem; }
   .work { margin-inline: -1.25rem; padding-inline: 1.25rem; }
-  .press-cols { grid-template-columns: 1fr 1fr; }
-  .press-kind:last-child { grid-column: 1 / -1; }
   .contact-rows { margin-inline: -1.25rem; }
   .contact-row { padding-inline: 1.25rem; min-height: 5.25rem; flex-wrap: wrap; align-items: flex-end; }
   .contact-value { text-align: left; width: 100%; padding-bottom: 0; }
   .foot { grid-template-columns: 1fr; gap: 0.5rem; padding-top: 4rem; }
   .foot-links, .foot-year { justify-self: start; text-align: left; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
 }
+@media (max-width: 36em) { .nav-action { display: none; } }
 @media (max-width: 26em) {
   .videos { grid-template-columns: 1fr; }
-  .press-cols { grid-template-columns: 1fr; }
-  .press-kind:last-child { grid-column: auto; }
   .nav-links { gap: 0.75rem; font-size: 0.875rem; }
-  .nav-action { display: none; }
   .brand-list { columns: 1; }
 }
 
@@ -295,13 +311,17 @@ a.contact-row:hover .contact-value { color: var(--accent-ink); }
 @media (min-width: 60em) and (max-height: 40em) {
   .still-img[data-photo="matt"] { object-position: 50% 12%; }
 }
-@media (max-width: 59.99em) { .still-img { object-position: 50% 18%; } .still-img[data-photo="matt"] { object-position: 50% 20%; } }
+@media (max-width: 59.99em) {
+  .still-img { object-position: 50% 18%; }
+  /* The portrait sits on the same green as the frame, so on a short band we let it keep its shape (contain) and show the whole head. */
+  .still-img[data-photo="matt"] { object-fit: contain; object-position: 50% 0; height: 136%; }
+}
 
 /* inline pictures */
 .picture { margin-top: clamp(1.75rem, 3vw, 2.5rem); }
 .picture img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
 .picture figcaption { margin-top: 0.7rem; max-width: 52ch; }
-.press .picture { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+.watch .picture { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .brands .picture { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 @media (prefers-reduced-motion: no-preference) {
   .js .shutter[data-reveal] { opacity: 1; transform: none; clip-path: inset(0 0 100% 0); transition: clip-path 1100ms var(--ease-in-out); }

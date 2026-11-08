@@ -103,4 +103,30 @@
       slides[manual].style.opacity = '1'; slides[manual].style.visibility = 'visible';
     });
   }
+
+  // 7. As seen in: one headline card at a time. The next swipes the current one out; a tap on a name jumps to it.
+  const press = document.getElementById('press-stage');
+  if (press) {
+    const marks = [...press.querySelectorAll('.press-mark')];
+    const cards = [...press.querySelectorAll('.press-card')];
+    let i = 0, timer = 0, paused = false, inView = false;
+    const go = (n) => {
+      if (n === i) return;
+      cards[i].classList.remove('is-on'); cards[i].classList.add('is-out');
+      const prev = cards[i];
+      setTimeout(() => prev.classList.remove('is-out'), 700);
+      i = n;
+      cards[i].classList.add('is-on');
+      marks.forEach((m, k) => { m.classList.toggle('is-on', k === i); m.setAttribute('aria-pressed', String(k === i)); });
+    };
+    const schedule = () => { clearTimeout(timer); if (reduce || paused || !inView) return; timer = setTimeout(() => { go((i + 1) % cards.length); schedule(); }, 4200); };
+    marks.forEach((m, k) => m.addEventListener('click', () => { go(k); schedule(); }));
+    press.addEventListener('pointerenter', () => { paused = true; clearTimeout(timer); });
+    press.addEventListener('pointerleave', () => { paused = false; schedule(); });
+    press.addEventListener('focusin', () => { paused = true; clearTimeout(timer); });
+    press.addEventListener('focusout', () => { paused = false; schedule(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => { inView = entries.some((e) => e.isIntersecting); schedule(); }, { threshold: 0.3 }).observe(press);
+    } else { inView = true; schedule(); }
+  }
 })();
