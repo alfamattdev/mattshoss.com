@@ -124,6 +124,8 @@ p { max-width: 62ch; text-wrap: pretty; }
 .row-link:active { transform: scale(0.992); }
 .row-icon { grid-area: icon; align-self: center; display: grid; place-items: center; width: 3rem; aspect-ratio: 1; background: var(--bg); overflow: clip; transition: transform var(--t-ui) var(--ease-out); }
 .row-icon img { width: 2rem; height: 2rem; object-fit: contain; display: block; }
+.row-icon-dark { background: #1f2124; }
+.row-icon .donut { width: 100%; height: 100%; display: block; }
 .row-link:hover .row-icon { transform: scale(1.06) rotate(-3deg); }
 .row-link:hover .row-tag { color: var(--accent-ink); }
 .row-name { grid-area: name; font-size: var(--step-item); font-family: var(--font-display); letter-spacing: -0.01em; line-height: 1.15; }
